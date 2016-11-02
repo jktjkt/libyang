@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+DH_VERBOSE = 1
+
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+%:
+	dh $@ --parallel
+
+# apply the lintian-overrides to ALL the packages
+# https://github.com/dkogan/buildsystem/blob/master/sample/debian/rules
+override_dh_lintian:
+	perl -ne 'print "$$1\n" if /^Package:\s*(\S+)/' debian/control | xargs -n1 -I{} bash -c 'cat debian/lintian-overrides >> debian/{}.lintian-overrides'
+	cp debian/lintian-overrides debian/source.lintian-overrides
+	dh_lintian
+

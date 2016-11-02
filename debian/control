@@ -1,0 +1,18 @@
+Source: libyang
+Priority: optional
+Maintainer: Jan Kundrát <jan.kundrat@cesnet.cz>
+Build-Depends: debhelper (>= 9), cmake, libpcre3-dev
+Standards-Version: 3.9.6
+Section: libs
+Homepage: https://github.com/CESNET/libyang
+
+Package: libyang-dev
+Section: libdevel
+Architecture: any
+Depends: libyang0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
+Description: YANG data modeling language library
+
+Package: libyang0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: YANG data modeling language library

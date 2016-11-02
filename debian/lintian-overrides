@@ -1,0 +1,8 @@
+# Yes, this is "a hack". On the other hand, sorry, we're in full control of the
+# entire SW chain, and I have much better stuff to do than duplicating all info
+# form the SW stack into Debian-specific packaging, thank you.
+no-debian-copyright
+new-package-should-close-itp-bug
+no-copyright-file
+extended-description-is-empty
+package-name-doesnt-match-sonames
