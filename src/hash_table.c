@@ -15,7 +15,6 @@
 #include "hash_table.h"
 
 #include <assert.h>
-#include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

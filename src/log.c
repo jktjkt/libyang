@@ -18,7 +18,6 @@
 
 #include <assert.h>
 #include <inttypes.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>

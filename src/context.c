@@ -23,7 +23,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>

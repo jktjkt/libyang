@@ -22,7 +22,6 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <limits.h>
-#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
