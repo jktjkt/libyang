@@ -100,13 +100,13 @@ void
 lyb_cache_module_hash(const struct lys_module *mod)
 {
     /* LOCK */
-    pthread_mutex_lock(&mod->ctx->lyb_hash_lock);
+    mtx_lock(&mod->ctx->lyb_hash_lock);
 
     /* store all cached hashes for all the nodes */
     lysc_module_dfs_full(mod, lyb_cache_node_hash_cb, NULL);
 
     /* UNLOCK */
-    pthread_mutex_unlock(&mod->ctx->lyb_hash_lock);
+    mtx_unlock(&mod->ctx->lyb_hash_lock);
 }
 
 ly_bool

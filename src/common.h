@@ -15,10 +15,10 @@
 #ifndef LY_COMMON_H_
 #define LY_COMMON_H_
 
-#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <threads.h>
 
 #include "compat.h"
 #include "context.h"
@@ -332,8 +332,8 @@ struct ly_ctx {
                                            more times */
     uint16_t flags;                   /**< context settings, see @ref contextoptions */
 
-    pthread_key_t errlist_key;        /**< key for the thread-specific list of errors related to the context */
-    pthread_mutex_t lyb_hash_lock;    /**< lock for storing LYB schema hashes in schema nodes */
+    tss_t errlist_key;                /**< key for the thread-specific list of errors related to the context */
+    mtx_t lyb_hash_lock;              /**< lock for storing LYB schema hashes in schema nodes */
 };
 
 /**

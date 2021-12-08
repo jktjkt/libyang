@@ -169,7 +169,7 @@ ly_err_first(const struct ly_ctx *ctx)
 {
     LY_CHECK_ARG_RET(NULL, ctx, NULL);
 
-    return pthread_getspecific(ctx->errlist_key);
+    return tss_get(ctx->errlist_key);
 }
 
 API struct ly_err_item *
@@ -179,7 +179,7 @@ ly_err_last(const struct ly_ctx *ctx)
 
     LY_CHECK_ARG_RET(NULL, ctx, NULL);
 
-    e = pthread_getspecific(ctx->errlist_key);
+    e = tss_get(ctx->errlist_key);
     return e ? e->prev : NULL;
 }
 
@@ -218,7 +218,7 @@ ly_err_clean(struct ly_ctx *ctx, struct ly_err_item *eitem)
     } else {
         /* free all err */
         ly_err_free(first);
-        pthread_setspecific(ctx->errlist_key, NULL);
+        tss_set(ctx->errlist_key, NULL);
     }
 }
 
@@ -344,7 +344,7 @@ log_store(const struct ly_ctx *ctx, LY_LOG_LEVEL level, LY_ERR no, LY_VECODE vec
 
     assert(ctx && (level < LY_LLVRB));
 
-    eitem = pthread_getspecific(ctx->errlist_key);
+    eitem = tss_get(ctx->errlist_key);
     if (!eitem) {
         /* if we are only to fill in path, there must have been an error stored */
         assert(msg);
@@ -353,7 +353,7 @@ log_store(const struct ly_ctx *ctx, LY_LOG_LEVEL level, LY_ERR no, LY_VECODE vec
         eitem->prev = eitem;
         eitem->next = NULL;
 
-        pthread_setspecific(ctx->errlist_key, eitem);
+        tss_set(ctx->errlist_key, eitem);
     } else if (!msg) {
         /* only filling the path */
         assert(path);

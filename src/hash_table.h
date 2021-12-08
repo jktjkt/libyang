@@ -16,9 +16,9 @@
 #ifndef LY_HASH_TABLE_H_
 #define LY_HASH_TABLE_H_
 
-#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <threads.h>
 
 #include "compat.h"
 #include "log.h"
@@ -108,7 +108,7 @@ struct dict_rec {
  */
 struct dict_table {
     struct hash_table *hash_tab;
-    pthread_mutex_t lock;
+    mtx_t lock;
 };
 
 /**

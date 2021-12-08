@@ -78,7 +78,16 @@ extern struct lyplg_ext_record plugins_metadata[];
 extern struct lyplg_ext_record plugins_nacm[];
 extern struct lyplg_ext_record plugins_yangdata[];
 
-static pthread_mutex_t plugins_guard = PTHREAD_MUTEX_INITIALIZER;
+static once_flag plugins_guard_init;
+static mtx_t plugins_guard;
+
+void init_plugins_mutex()
+{
+    if (mtx_init(&plugins_guard, mtx_plain)) {
+        fprintf(stderr, "Cannot initalize libyang plugin mutex\n");
+        abort();
+    }
+}
 
 /**
  * @brief Counter for currently present contexts able to refer to the loaded plugins.
@@ -223,9 +232,9 @@ void
 lyplg_clean(void)
 {
 #ifndef STATIC
-    pthread_mutex_lock(&plugins_guard);
+    mtx_lock(&plugins_guard);
     lyplg_clean_();
-    pthread_mutex_unlock(&plugins_guard);
+    mtx_unlock(&plugins_guard);
 #endif
 }
 
@@ -416,11 +425,13 @@ lyplg_init(void)
 {
     LY_ERR ret;
 
-    pthread_mutex_lock(&plugins_guard);
+    call_once(&plugins_guard_init, init_plugins_mutex);
+
+    mtx_lock(&plugins_guard);
     /* let only the first context to initiate plugins, but let others wait for finishing the initiation */
     if (context_refcount++) {
         /* already initiated */
-        pthread_mutex_unlock(&plugins_guard);
+        mtx_unlock(&plugins_guard);
         return LY_SUCCESS;
     }
 
@@ -467,7 +478,7 @@ lyplg_init(void)
 #endif
 
     /* initiation done, wake-up possibly waiting threads creating another contexts */
-    pthread_mutex_unlock(&plugins_guard);
+    mtx_unlock(&plugins_guard);
 
     return LY_SUCCESS;
 
@@ -476,7 +487,7 @@ error:
 #ifndef STATIC
     lyplg_clean_();
 #endif
-    pthread_mutex_unlock(&plugins_guard);
+    mtx_unlock(&plugins_guard);
 
     if (ret == LY_EINVAL) {
         /* all the plugins here are internal, invalid record actually means an internal libyang error */
@@ -498,18 +509,20 @@ lyplg_add(const char *pathname)
 
     LY_CHECK_ARG_RET(NULL, pathname, LY_EINVAL);
 
+    call_once(&plugins_guard_init, init_plugins_mutex);
+
     /* works only in case a context exists */
-    pthread_mutex_lock(&plugins_guard);
+    mtx_lock(&plugins_guard);
     if (!context_refcount) {
         /* no context */
-        pthread_mutex_unlock(&plugins_guard);
+        mtx_unlock(&plugins_guard);
         LOGERR(NULL, LY_EDENIED, "To add a plugin, at least one context must exists.");
         return LY_EDENIED;
     }
 
     ret = plugins_load_module(pathname);
 
-    pthread_mutex_unlock(&plugins_guard);
+    mtx_unlock(&plugins_guard);
 
     return ret;
 #endif

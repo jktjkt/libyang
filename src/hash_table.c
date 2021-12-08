@@ -56,7 +56,7 @@ lydict_init(struct dict_table *dict)
 
     dict->hash_tab = lyht_new(LYDICT_MIN_SIZE, sizeof(struct dict_rec), lydict_val_eq, NULL, 1);
     LY_CHECK_ERR_RET(!dict->hash_tab, LOGINT(NULL), );
-    pthread_mutex_init(&dict->lock, NULL);
+    mtx_init(&dict->lock, mtx_plain);
 }
 
 void
@@ -87,7 +87,7 @@ lydict_clean(struct dict_table *dict)
 
     /* free table and destroy mutex */
     lyht_free(dict->hash_tab);
-    pthread_mutex_destroy(&dict->lock);
+    mtx_destroy(&dict->lock);
 }
 
 /*
@@ -177,7 +177,7 @@ lydict_remove(const struct ly_ctx *ctx, const char *value)
     rec.value = (char *)value;
     rec.refcount = 0;
 
-    pthread_mutex_lock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_lock((mtx_t *)&ctx->dict.lock);
     /* set len as data for compare callback */
     lyht_set_cb_data(ctx->dict.hash_tab, (void *)&len);
     /* check if value is already inserted */
@@ -206,7 +206,7 @@ lydict_remove(const struct ly_ctx *ctx, const char *value)
     }
 
 finish:
-    pthread_mutex_unlock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_unlock((mtx_t *)&ctx->dict.lock);
     return ret;
 }
 
@@ -277,9 +277,9 @@ lydict_insert(const struct ly_ctx *ctx, const char *value, size_t len, const cha
         len = strlen(value);
     }
 
-    pthread_mutex_lock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_lock((mtx_t *)&ctx->dict.lock);
     result = dict_insert(ctx, (char *)value, len, 0, str_p);
-    pthread_mutex_unlock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_unlock((mtx_t *)&ctx->dict.lock);
 
     return result;
 }
@@ -296,9 +296,9 @@ lydict_insert_zc(const struct ly_ctx *ctx, char *value, const char **str_p)
         return LY_SUCCESS;
     }
 
-    pthread_mutex_lock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_lock((mtx_t *)&ctx->dict.lock);
     result = dict_insert(ctx, value, strlen(value), 1, str_p);
-    pthread_mutex_unlock((pthread_mutex_t *)&ctx->dict.lock);
+    mtx_unlock((mtx_t *)&ctx->dict.lock);
 
     return result;
 }

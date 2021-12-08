@@ -246,10 +246,10 @@ ly_ctx_new(const char *search_dir, uint16_t options, struct ly_ctx **new_ctx)
     LY_CHECK_ERR_GOTO(lyplg_init(), LOGINT(NULL); rc = LY_EINT, cleanup);
 
     /* initialize thread-specific keys */
-    while ((pthread_key_create(&ctx->errlist_key, ly_err_free)) == EAGAIN) {}
+    while ((tss_create(&ctx->errlist_key, ly_err_free)) == EAGAIN) {}
 
     /* init LYB hash lock */
-    pthread_mutex_init(&ctx->lyb_hash_lock, NULL);
+    mtx_init(&ctx->lyb_hash_lock, mtx_plain);
 
     /* models list */
     ctx->flags = options;
@@ -1232,13 +1232,13 @@ ly_ctx_destroy(struct ly_ctx *ctx)
 
     /* clean the error list */
     ly_err_clean(ctx, 0);
-    pthread_key_delete(ctx->errlist_key);
+    tss_delete(ctx->errlist_key);
 
     /* dictionary */
     lydict_clean(&ctx->dict);
 
     /* LYB hash lock */
-    pthread_mutex_destroy(&ctx->lyb_hash_lock);
+    mtx_destroy(&ctx->lyb_hash_lock);
 
     /* plugins - will be removed only if this is the last context */
     lyplg_clean();
