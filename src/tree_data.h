@@ -16,6 +16,7 @@
 #ifndef LY_TREE_DATA_H_
 #define LY_TREE_DATA_H_
 
+#if 0
 #ifndef _MSC_VER
 #  include <arpa/inet.h>
 #  if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
@@ -25,6 +26,7 @@
 #else
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
+#endif
 #endif
 #include <stddef.h>
 #include <stdint.h>
@@ -624,6 +626,7 @@ struct lyd_value_binary {
     size_t size;    /**< size of @p data value in bytes */
 };
 
+#if 0
 /**
  * @brief Special lyd_value structure for ietf-inet-types ipv4-address-no-zone values.
  */
@@ -669,6 +672,7 @@ struct lyd_value_ipv6_prefix {
     struct in6_addr addr;   /**< IPv6 host address in binary */
     uint8_t prefix;         /**< prefix length (0 - 128) */
 };
+#endif
 
 /**
  * @brief Special lyd_value structure for ietf-yang-types date-and-time values.
