@@ -149,6 +149,7 @@ set(libsrc
     ${type_plugins})
 
 set(headers
+    src/build.h
     src/context.h
     src/dict.h
     src/in.h
@@ -337,7 +338,10 @@ if(ENABLE_STATIC)
 else()
     set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
     add_library(yangobj OBJECT ${libsrc} ${compatsrc})
-    set_target_properties(yangobj PROPERTIES COMPILE_FLAGS "-fvisibility=hidden")
+    if(NOT WIN32)
+        set_target_properties(yangobj PROPERTIES COMPILE_FLAGS "-fvisibility=hidden")
+    endif()
+    target_compile_definitions(yangobj PRIVATE LIBYANG_BUILD)
     add_library(yang SHARED $<TARGET_OBJECTS:yangobj>)
 
     #link dl
