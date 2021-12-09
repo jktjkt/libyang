@@ -56,6 +56,7 @@
 #cmakedefine HAVE_STRDUPA
 #cmakedefine HAVE_STRCHRNUL
 #cmakedefine HAVE_GET_CURRENT_DIR_NAME
+#cmakedefine HAVE_SSIZE_T
 
 #ifndef bswap64
 #define bswap64(val) \
@@ -116,6 +117,11 @@ int asprintf(char **strp, const char *fmt, ...);
 
 #ifndef HAVE_VASPRINTF
 int vasprintf(char **strp, const char *fmt, va_list ap);
+#endif
+
+#ifndef HAVE_SSIZE_T
+#include <BaseTsd.h>
+#define ssize_t SSIZE_T
 #endif
 
 #ifndef HAVE_GETLINE
