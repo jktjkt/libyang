@@ -32,6 +32,7 @@ macro(USE_COMPAT)
     check_symbol_exists(vdprintf "stdio.h;stdarg.h" HAVE_VDPRINTF)
     check_symbol_exists(asprintf "stdio.h" HAVE_ASPRINTF)
     check_symbol_exists(vasprintf "stdio.h" HAVE_VASPRINTF)
+    check_type_size(ssize_t HAVE_SSIZE_T)
     check_symbol_exists(getline "stdio.h" HAVE_GETLINE)
 
     check_symbol_exists(strndup "string.h" HAVE_STRNDUP)
