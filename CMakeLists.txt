@@ -350,6 +350,12 @@ else()
     target_link_libraries(yang ${CMAKE_DL_LIBS})
 endif()
 
+if(WIN32)
+    target_link_libraries(yang ws2_32)
+    # prevent redefinitions of inet/socket/... symbols
+    target_compile_definitions(yang PUBLIC _WINSOCKAPI_)
+endif()
+
 set_target_properties(yang PROPERTIES VERSION ${LIBYANG_SOVERSION_FULL} SOVERSION ${LIBYANG_SOVERSION})
 
 # link math
