@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "libyang.h"
+#include "compat.h"
 
 #define MODULE_CREATE_YIN(MOD_NAME, NODES) \
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" \
@@ -90,6 +91,7 @@ test_data_xml(void **state)
     UTEST_ADD_MODULE(schema, LYS_IN_YANG, NULL, NULL);
 
     /* date-and-time */
+#ifdef HAVE_TM_GMTOFF
     TEST_SUCCESS_XML("a", "l", "2005-05-25T23:15:15.88888Z", STRING, "2005-05-25T21:15:15.88888-02:00");
     TEST_SUCCESS_XML("a", "l", "2005-05-31T23:15:15-08:59", STRING, "2005-06-01T06:14:15-02:00");
     TEST_SUCCESS_XML("a", "l", "2005-05-31T23:15:15-23:00", STRING, "2005-06-01T20:15:15-02:00");
@@ -100,6 +102,12 @@ test_data_xml(void **state)
 
     /* canonize */
     TEST_SUCCESS_XML("a", "l", "2005-02-29T23:15:15-02:00", STRING, "2005-03-01T23:15:15-02:00");
+#else
+    /* Tests run with a TZ offset of +02:00.
+     * Strictly speaking, this result is "not wrong" because we're indeed saying "unspecified TZ". */
+    TEST_SUCCESS_XML("a", "l", "2005-05-25T23:15:15.88888Z", STRING, "2005-05-25T21:15:15.88888-00:00");
+    TEST_SUCCESS_XML("a", "l", "2005-05-25T23:15:15.88888+04:30", STRING, "2005-05-25T16:45:15.88888-00:00");
+#endif
 
     /* unknown timezone */
     TEST_SUCCESS_XML("a", "l", "2017-02-01T00:00:00-00:00", STRING, "2017-02-01T00:00:00-00:00");

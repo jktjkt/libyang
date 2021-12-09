@@ -58,6 +58,7 @@
 #cmakedefine HAVE_STRCHRNUL
 #cmakedefine HAVE_GET_CURRENT_DIR_NAME
 #cmakedefine HAVE_PTHREAD_MUTEX_TIMEDLOCK
+#cmakedefine HAVE_TM_GMTOFF
 
 #ifndef bswap64
 #define bswap64(val) \

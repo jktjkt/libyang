@@ -47,6 +47,9 @@ macro(USE_COMPAT)
 
     check_include_file("stdatomic.h" HAVE_STDATOMIC)
 
+    include(CheckStructHasMember)
+    check_struct_has_member("struct tm" tm_gmtoff time.h HAVE_TM_GMTOFF)
+
     unset(CMAKE_REQUIRED_DEFINITIONS)
     unset(CMAKE_REQUIRED_LIBRARIES)
 
