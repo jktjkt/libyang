@@ -144,7 +144,9 @@ void *tss_get(tss_t key);
 int tss_set(tss_t key, void *val);
 
 int xtime_get(xtime *xt, int base);
+#ifndef TIME_UTC
 enum { TIME_UTC = 1 };
+#endif
 
 
 #endif /* EMULATED_THREADS_H_INCLUDED_ */
