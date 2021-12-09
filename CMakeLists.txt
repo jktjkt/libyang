@@ -146,7 +146,7 @@ set(libsrc
     src/xml.c
     src/xpath.c
     src/validation.c
-    ${type_plugins})
+    ${type_plugins} ${threads_compat})
 
 set(headers
     src/context.h
@@ -306,6 +306,12 @@ endif()
 if ("${BUILD_TYPE_UPPER}" STREQUAL "DEBUG")
     # enable before adding tests to let them detect that format checking is available - one of the tests is format checking
     source_format_enable()
+endif()
+
+if(WIN32)
+    # MSVC still doesn't do <threads.h> unfortunately
+    include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/compat/c11-threads)
+    set(threads_compat compat/c11-threads/threads_msvc.c)
 endif()
 
 # generate files
