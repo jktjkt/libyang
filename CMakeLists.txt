@@ -368,6 +368,10 @@ if(WIN32)
         target_include_directories(yangobj PRIVATE ${COMPAT_POSIX_INCLUDES})
     endif()
     target_include_directories(yang PRIVATE ${COMPAT_POSIX_INCLUDES})
+
+    target_link_libraries(yang ws2_32)
+    # prevent redefinitions of inet/socket/... symbols
+    target_compile_definitions(yang PUBLIC _WINSOCKAPI_)
 endif()
 
 set_target_properties(yang PROPERTIES VERSION ${LIBYANG_SOVERSION_FULL} SOVERSION ${LIBYANG_SOVERSION})
