@@ -63,6 +63,7 @@
 #cmakedefine HAVE_TIME_H_TIMEZONE
 #cmakedefine HAVE_REALPATH
 #cmakedefine HAVE_STRPTIME
+#cmakedefine HAVE_STRCASECMP
 
 #ifndef bswap64
 #define bswap64(val) \
