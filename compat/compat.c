@@ -278,3 +278,12 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
 }
 #endif
 #endif
+
+#ifdef _WIN32
+#include <shlwapi.h>
+char *dirname(char *path)
+{
+    PathRemoveFileSpecA(path);
+    return path;
+}
+#endif
