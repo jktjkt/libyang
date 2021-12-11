@@ -54,6 +54,7 @@ macro(USE_COMPAT)
     check_symbol_exists(realpath "stdlib.h" HAVE_REALPATH)
     check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
     check_symbol_exists(strptime "time.h" HAVE_STRPTIME)
+    check_symbol_exists(setenv "stdlib.h" HAVE_SETENV)
 
     unset(CMAKE_REQUIRED_DEFINITIONS)
     unset(CMAKE_REQUIRED_LIBRARIES)
