@@ -409,6 +409,19 @@ static void
 log_vprintf(const struct ly_ctx *ctx, LY_LOG_LEVEL level, LY_ERR no, LY_VECODE vecode, char *path, const char *apptag,
         const char *format, va_list args)
 {
+#if 1
+    va_list debug_va;
+    va_copy(debug_va, args);
+    fprintf(stderr, "libyang[%d]: ", level);
+    vfprintf(stderr, format, debug_va);
+    if (path) {
+        fprintf(stderr, " (path: %s)\n", path);
+    } else {
+        fprintf(stderr, "\n");
+    }
+    va_end(debug_va);
+#endif
+
     char *msg = NULL;
     ly_bool free_strs;
 

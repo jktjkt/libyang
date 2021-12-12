@@ -34,6 +34,8 @@
 #include "tree_schema_internal.h"
 #include "xml.h"
 
+#include <inttypes.h>
+
 void *
 ly_realloc(void *ptr, size_t size)
 {
