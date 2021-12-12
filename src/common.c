@@ -24,7 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -346,6 +348,7 @@ LY_VCODE_INSTREXP_len(const char *str)
     return len;
 }
 
+#ifdef HAVE_MMAP
 LY_ERR
 ly_mmap(struct ly_ctx *ctx, int fd, size_t *length, void **addr)
 {
@@ -403,6 +406,7 @@ ly_munmap(void *addr, size_t length)
     }
     return LY_SUCCESS;
 }
+#endif
 
 LY_ERR
 ly_strcat(char **dest, const char *format, ...)

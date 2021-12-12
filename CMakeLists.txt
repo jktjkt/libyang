@@ -146,6 +146,7 @@ set(libsrc
     src/xml.c
     src/xpath.c
     src/validation.c
+    compat/faux_mmap.c
     ${type_plugins})
 
 set(headers
