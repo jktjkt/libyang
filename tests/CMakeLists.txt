@@ -15,9 +15,10 @@ function(ly_add_utest)
 
     add_executable(${TEST_NAME} ${TEST_SOURCES} $<TARGET_OBJECTS:yangobj>)
     target_compile_definitions(${TEST_NAME} PRIVATE LIBYANG_BUILD)
+    target_include_directories(${TEST_NAME} PRIVATE $<TARGET_FILE_DIR:${TEST_NAME}>)
 
     # Set common attributes of all tests
-    set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
+    set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out-utests")
     target_link_libraries(${TEST_NAME} ${CMOCKA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${PCRE2_LIBRARIES} ${CMAKE_DL_LIBS})
     if (NOT WIN32)
         target_link_libraries(${TEST_NAME} m)
@@ -51,3 +52,8 @@ if(ENABLE_PERF_TESTS)
 endif()
 
 set(format_sources ${format_sources} PARENT_SCOPE)
+
+get_target_property(TESTS_BIN_UTESTS utest_context RUNTIME_OUTPUT_DIRECTORY)
+get_target_property(TESTS_BIN_PLUGINS plugin_simple RUNTIME_OUTPUT_DIRECTORY)
+file(GENERATE OUTPUT "$<TARGET_FILE_DIR:utest_context>/tests_config2.h"
+    CONTENT "#define TESTS_BIN_UTESTS \"$<TARGET_FILE_DIR:utest_context>\"\n#define TESTS_BIN_PLUGINS \"$<TARGET_FILE_DIR:plugin_simple>\"\n")
