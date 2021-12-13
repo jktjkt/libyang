@@ -36,7 +36,7 @@ static void
 test_add_invalid(void **state)
 {
     (void)state;
-    assert_int_equal(LY_ESYS, lyplg_add(TESTS_BIN "/plugins/plugin_does_not_exist" LYPLG_SUFFIX));
+    assert_int_equal(LY_ESYS, lyplg_add(TESTS_BIN_PLUGINS "/plugin_does_not_exist" LYPLG_SUFFIX));
 }
 
 static void
@@ -47,7 +47,7 @@ test_add_simple(void **state)
     struct lyplg_ext *plugin_e;
     struct lyplg_type *plugin_t;
 
-    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN "/plugins/plugin_simple" LYPLG_SUFFIX));
+    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN_PLUGINS "/plugin_simple" LYPLG_SUFFIX));
 
     UTEST_ADD_MODULE(simple, LYS_IN_YANG, NULL, &mod);
 
@@ -64,7 +64,7 @@ test_add_simple(void **state)
     assert_ptr_equal(leaf->exts[0].def->plugin, plugin_e);
 
     /* the second loading of the same plugin - still success */
-    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN "/plugins/plugin_simple" LYPLG_SUFFIX));
+    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN_PLUGINS "/plugin_simple" LYPLG_SUFFIX));
 }
 
 static void
@@ -93,7 +93,7 @@ test_validation(void **state)
             "  }"
             "}";
 
-    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN "/plugins/plugin_validate" LYPLG_SUFFIX));
+    assert_int_equal(LY_SUCCESS, lyplg_add(TESTS_BIN_PLUGINS "/plugin_validate" LYPLG_SUFFIX));
 
     UTEST_ADD_MODULE(schema, LYS_IN_YANG, NULL, &mod);
 
