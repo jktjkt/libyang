@@ -44,6 +44,18 @@ test_input_mem(void **UNUSED(state))
     ly_in_free(in, 0);
 }
 
+#ifdef _WIN32
+int invalid_parameter_handler_called = 0;
+void empty_invalid_parameter_handler(const wchar_t* expression,
+   const wchar_t* function,
+   const wchar_t* file,
+   unsigned int line,
+   uintptr_t pReserved)
+{
+    ++invalid_parameter_handler_called;
+}
+#endif
+
 static void
 test_input_fd(void **UNUSED(state))
 {
@@ -68,10 +80,17 @@ test_input_fd(void **UNUSED(state))
     /* fd1 is still open */
     assert_int_equal(0, fstat(fd1, &statbuf));
     close(fd1);
+#ifdef _WIN32
+    _invalid_parameter_handler old_invalid_param_handler = _set_invalid_parameter_handler(empty_invalid_parameter_handler);
+#endif
     /* but fd2 was closed by ly_in_free() */
     errno = 0;
     assert_int_equal(-1, fstat(fd2, &statbuf));
     assert_int_equal(errno, EBADF);
+#ifdef _WIN32
+    _set_invalid_parameter_handler(old_invalid_param_handler);
+    assert_int_equal(invalid_parameter_handler_called, 1);
+#endif
 }
 
 static void
