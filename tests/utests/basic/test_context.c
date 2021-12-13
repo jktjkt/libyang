@@ -36,11 +36,13 @@ test_searchdirs(void **state)
     CHECK_LOG("Invalid argument ctx (ly_ctx_unset_searchdir()).", NULL);
 
     /* readable and executable, but not a directory */
-    assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN "/utest_context"));
+    assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN "/utest_context" CMAKE_EXECUTABLE_SUFFIX));
     CHECK_LOG_CTX("Given search directory \""TESTS_BIN "/utest_context\" is not a directory.", NULL);
+#ifndef _WIN32
     /* not executable */
     assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, __FILE__));
     CHECK_LOG_CTX("Unable to fully access search directory \""__FILE__ "\" (Permission denied).", NULL);
+#endif
     /* not existing */
     assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, "/nonexistingfile"));
     CHECK_LOG_CTX("Unable to use search directory \"/nonexistingfile\" (No such file or directory).", NULL);
