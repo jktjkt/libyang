@@ -76,7 +76,7 @@ if(NOT WIN32)
 else()
     set(C_STANDARD 11)
     set(C_STANDARD_REQUIRED ON)
-    set(CMAKE_C_FLAGS "/Zc:preprocessor /W3 /wd4711 /w14013 ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "/Zc:preprocessor /W3 /wd4711 /w14013 /utf-8 ${CMAKE_C_FLAGS}")
 endif()
 
 include_directories(${PROJECT_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src)
