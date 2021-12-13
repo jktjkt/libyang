@@ -13,6 +13,8 @@ function(ly_add_plugin)
     add_library(${PLUGIN_NAME} MODULE ${PLUGIN_SOURCES})
     set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
     target_link_libraries(${PLUGIN_NAME} yang)
+    set_target_properties(${PLUGIN_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out-plugins")
+    set_target_properties(${PLUGIN_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out-plugins")
 endfunction(ly_add_plugin)
 
 ly_add_plugin(NAME invalid SOURCES invalid.c)
