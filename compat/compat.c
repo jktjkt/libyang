@@ -262,3 +262,17 @@ char *realpath(const char *path, char *resolved_path)
 }
 #endif
 #endif
+
+#ifndef HAVE_LOCALTIME_R
+#ifdef _WIN32
+struct tm *localtime_r(const time_t *timep, struct tm *result)
+{
+    errno_t res = localtime_s(result, timep);
+    if (res) {
+        return NULL;
+    } else {
+        return result;
+    }
+}
+#endif
+#endif

@@ -163,4 +163,8 @@ int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *absti
 char *realpath(const char *path, char *resolved_path);
 #endif
 
+#ifndef HAVE_LOCALTIME_R
+struct tm *localtime_r(const time_t *timep, struct tm *result);
+#endif
+
 #endif /* _COMPAT_H_ */
