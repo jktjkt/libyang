@@ -368,12 +368,14 @@ if(WIN32)
 
     if(TARGET yangobj)
         target_include_directories(yangobj PRIVATE ${COMPAT_POSIX_INCLUDES})
+        target_compile_definitions(yangobj PUBLIC _WINSOCKAPI_)
     endif()
     target_include_directories(yang PRIVATE ${COMPAT_POSIX_INCLUDES})
+    target_compile_definitions(yang PUBLIC _WINSOCKAPI_)
     include_directories(${COMPAT_POSIX_INCLUDES})
 
     find_package(pthreads REQUIRED)
-    set(COMPAT_WIN_LIBRARIES PThreads4W::PThreads4W shlwapi.lib)
+    set(COMPAT_WIN_LIBRARIES PThreads4W::PThreads4W shlwapi.lib ws2_32)
     target_link_libraries(yang ${COMPAT_WIN_LIBRARIES})
 endif()
 

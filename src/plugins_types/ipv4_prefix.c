@@ -16,10 +16,15 @@
 
 #include "plugins_types.h"
 
-#include <arpa/inet.h>
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
-#include <netinet/in.h>
-#include <sys/socket.h>
+#ifndef _WIN32
+#  include <arpa/inet.h>
+#  if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#    include <netinet/in.h>
+#    include <sys/socket.h>
+#  endif
+#else
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
 #endif
 #include <stdint.h>
 #include <stdlib.h>
