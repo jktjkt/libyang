@@ -22,6 +22,36 @@
 #include "tree_schema_internal.h"
 #include "utests.h"
 
+#ifdef _WIN32
+static void slashes_to_backslashes(char *path)
+{
+    while ((path = strchr(path, '/'))) {
+        *path = '\\';
+    }
+}
+#endif
+
+static void assert_string_equal_backslashes(const char *expected_with_slashes, const char *tested_maybe_backslashed)
+{
+    char *tmp = strdup(expected_with_slashes);
+#ifdef _WIN32
+    slashes_to_backslashes(tmp);
+#endif
+    assert_string_equal(tmp, tested_maybe_backslashed);
+    free(tmp);
+}
+
+static LY_ERR ly_ctx_unset_searchdir_backslashes(struct ly_ctx *ctx, const char *value)
+{
+    char *tmp = strdup(value);
+#ifdef _WIN32
+    slashes_to_backslashes(tmp);
+#endif
+    LY_ERR ret = ly_ctx_unset_searchdir(ctx, tmp);
+    free(tmp);
+    return ret;
+}
+
 static void
 test_searchdirs(void **state)
 {
@@ -37,15 +67,24 @@ test_searchdirs(void **state)
 
     /* readable and executable, but not a directory */
     assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN_UTESTS "/utest_context" CMAKE_EXECUTABLE_SUFFIX));
+#ifndef _WIN32
     CHECK_LOG_CTX("Given search directory \""TESTS_BIN_UTESTS "/utest_context" CMAKE_EXECUTABLE_SUFFIX "\" is not a directory.", NULL);
+#else
+    {
+        char *msg = strdup("Given search directory \""TESTS_BIN_UTESTS "/utest_context" CMAKE_EXECUTABLE_SUFFIX "\" is not a directory.");
+        slashes_to_backslashes(msg);
+        CHECK_LOG_CTX(msg, NULL);
+        free(msg);
+    }
+#endif
 #ifndef _WIN32
     /* not executable */
     assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, __FILE__));
     CHECK_LOG_CTX("Unable to fully access search directory \""__FILE__ "\" (Permission denied).", NULL);
 #endif
     /* not existing */
-    assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, "/nonexistingfile"));
-    CHECK_LOG_CTX("Unable to use search directory \"/nonexistingfile\" (No such file or directory).", NULL);
+    assert_int_equal(LY_EINVAL, ly_ctx_set_searchdir(UTEST_LYCTX, __FILE__ ".nonexistingfile"));
+    CHECK_LOG_CTX("Unable to use search directory \"" __FILE__ ".nonexistingfile\" (No such file or directory).", NULL);
 
     /* ly_set_add() fails */
     /* no change */
@@ -54,12 +93,12 @@ test_searchdirs(void **state)
     /* correct path */
     assert_int_equal(LY_SUCCESS, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN "/utests"));
     assert_int_equal(1, UTEST_LYCTX->search_paths.count);
-    assert_string_equal(TESTS_BIN "/utests", UTEST_LYCTX->search_paths.objs[0]);
+    assert_string_equal_backslashes(TESTS_BIN "/utests", UTEST_LYCTX->search_paths.objs[0]);
 
     /* duplicated paths */
     assert_int_equal(LY_EEXIST, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN "/utests"));
     assert_int_equal(1, UTEST_LYCTX->search_paths.count);
-    assert_string_equal(TESTS_BIN "/utests", UTEST_LYCTX->search_paths.objs[0]);
+    assert_string_equal_backslashes(TESTS_BIN "/utests", UTEST_LYCTX->search_paths.objs[0]);
 
     /* another paths - add 8 to fill the initial buffer of the searchpaths list */
     assert_int_equal(LY_SUCCESS, ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_BIN "/CMakeFiles"));
@@ -73,10 +112,10 @@ test_searchdirs(void **state)
     /* get searchpaths */
     list = ly_ctx_get_searchdirs(UTEST_LYCTX);
     assert_non_null(list);
-    assert_string_equal(TESTS_BIN "/utests", list[0]);
-    assert_string_equal(TESTS_BIN "/CMakeFiles", list[1]);
-    assert_string_equal(TESTS_SRC, list[5]);
-    assert_string_equal(TESTS_BIN, list[6]);
+    assert_string_equal_backslashes(TESTS_BIN "/utests", list[0]);
+    assert_string_equal_backslashes(TESTS_BIN "/CMakeFiles", list[1]);
+    assert_string_equal_backslashes(TESTS_SRC, list[5]);
+    assert_string_equal_backslashes(TESTS_BIN, list[6]);
     assert_null(list[7]);
 
     /* removing searchpaths */
@@ -84,14 +123,23 @@ test_searchdirs(void **state)
     assert_int_equal(LY_EINVAL, ly_ctx_unset_searchdir(UTEST_LYCTX, "/nonexistingfile"));
     CHECK_LOG_CTX("Invalid argument value (ly_ctx_unset_searchdir()).", NULL);
     /* first */
-    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir(UTEST_LYCTX, TESTS_BIN "/utests"));
+    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir_backslashes(UTEST_LYCTX, TESTS_BIN "/utests"));
+#ifndef _WIN32
     assert_string_not_equal(TESTS_BIN "/utests", list[0]);
+#else
+    {
+        char *path = strdup(TESTS_BIN "/utests");
+        slashes_to_backslashes(path);
+        assert_string_not_equal(path, list[0]);
+        free(path);
+    }
+#endif
     assert_int_equal(6, UTEST_LYCTX->search_paths.count);
     /* middle */
-    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir(UTEST_LYCTX, TESTS_SRC));
+    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir_backslashes(UTEST_LYCTX, TESTS_SRC));
     assert_int_equal(5, UTEST_LYCTX->search_paths.count);
     /* last */
-    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir(UTEST_LYCTX, TESTS_BIN));
+    assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir_backslashes(UTEST_LYCTX, TESTS_BIN));
     assert_int_equal(4, UTEST_LYCTX->search_paths.count);
     /* all */
     assert_int_equal(LY_SUCCESS, ly_ctx_unset_searchdir(UTEST_LYCTX, NULL));
@@ -110,8 +158,8 @@ test_searchdirs(void **state)
             ly_ctx_new(TESTS_SRC PATH_SEPARATOR TESTS_BIN PATH_SEPARATOR TESTS_BIN PATH_SEPARATOR TESTS_SRC,
                 LY_CTX_DISABLE_SEARCHDIRS, &UTEST_LYCTX));
     assert_int_equal(2, UTEST_LYCTX->search_paths.count);
-    assert_string_equal(TESTS_SRC, UTEST_LYCTX->search_paths.objs[0]);
-    assert_string_equal(TESTS_BIN, UTEST_LYCTX->search_paths.objs[1]);
+    assert_string_equal_backslashes(TESTS_SRC, UTEST_LYCTX->search_paths.objs[0]);
+    assert_string_equal_backslashes(TESTS_BIN, UTEST_LYCTX->search_paths.objs[1]);
 }
 
 static void
