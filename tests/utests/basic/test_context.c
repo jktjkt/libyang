@@ -471,6 +471,12 @@ test_includes(void **state)
 
     ly_ctx_set_searchdir(UTEST_LYCTX, TESTS_DIR_MODULES_YANG);
 
+    const char* const* dirs = ly_ctx_get_searchdirs(UTEST_LYCTX);
+    while (dirs && *dirs) {
+        fprintf(stderr, "DIR: %s\n", *dirs);
+	++dirs;
+    }
+
     /* load b with c and d submodules */
     mod = ly_ctx_load_module(UTEST_LYCTX, "b", NULL, NULL);
     assert_non_null(mod);

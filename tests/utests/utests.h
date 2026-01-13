@@ -1347,6 +1347,21 @@ utest_teardown(void **state)
 {
     *state = NULL;
 
+    const struct ly_err_item* ee = NULL;
+    if ((ee = ly_err_first(current_utest_context->ctx))) {
+        fprintf(stderr, "ly_err_first: %p\n", (void*)ee);
+        fprintf(stderr, "ly_err_first->next: %p\n", (void*)(ee->next));
+        fprintf(stderr, "ERR: %s\n", ee->msg);
+    }
+    if ((ee = ly_err_last(current_utest_context->ctx))) {
+        fprintf(stderr, "ly_err_last: %p\n", (void*)ee);
+        fprintf(stderr, "ly_err_last->prev: %p\n", (void*)(ee->prev));
+    }
+    assert_null(ly_err_first(current_utest_context->ctx) || ly_err_last(current_utest_context->ctx));
+    for (const struct ly_err_item* e = ly_err_first(current_utest_context->ctx); e; e = e->next) {
+        ly_err_print(current_utest_context->ctx, e);
+    }
+
     /* libyang context, no leftover messages */
     assert_null(ly_err_last(current_utest_context->ctx));
     ly_ctx_destroy(current_utest_context->ctx);
