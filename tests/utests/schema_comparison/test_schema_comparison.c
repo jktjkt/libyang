@@ -129,7 +129,12 @@ schema_comparison(struct sc_state *st, const char *module_name)
 
     /* open file with the expected output */
     if (st->cmp_file_prefix) {
+#ifdef _WIN32
+        /* realpath()/_fullpath() always normalizes to backslashes on Windows */
+        ptr = strrchr(src_mod->filepath, '\\') + 1;
+#else
         ptr = strrchr(src_mod->filepath, '/') + 1;
+#endif
         r = asprintf(&path, "%.*s%s%s", (int)(ptr - src_mod->filepath), src_mod->filepath, st->cmp_file_prefix, ptr);
         assert_int_not_equal(r, -1);
     } else {
