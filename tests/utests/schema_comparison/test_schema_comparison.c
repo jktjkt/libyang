@@ -23,6 +23,7 @@
 
 #include <cmocka.h>
 
+#include "compat.h"
 #include "libyang.h"
 #include "tests_config.h"
 
